@@ -1,0 +1,69 @@
+TP2 - Conception et réponses (Problème 1)
+
+1) Quel principe SOLID est violé si la méthode "recompenser(Facture f)" est définie dans les classes de carte client ?
+
+- Principe violé : SRP (Single Responsibility Principle).
+- Explication : La classe carte client a alors deux responsabilités : représenter les données du client/la carte et contenir la logique de calcul des récompenses. Si la politique de récompense change, la classe carte doit être modifiée — donc elle n'a pas une seule raison de changer.
+
+
+2) La récompense dépend du mode de paiement et d'une instance de Facture. Quel principe est violé et pourquoi ?
+
+- Principes concernés : principalement OCP (Open/Closed Principle) et découplage (DIP en partie).
+- Explication : Si la logique de récompense est codée dans la carte et dépend des détails de Facture (montant, mode), tout ajout d'un nouveau mode de paiement ou nouvelle règle nécessite de modifier la (ou les) classe(s) de carte. Les classes ne sont pas « fermées pour modification ». De plus la dépendance aux détails concrets augmente le couplage.
+
+
+3) Si la logique de récompense est déplacée dans la classe Facture, quel principe SOLID est violé ?
+
+- Principe violé : SRP (encore).
+- Explication : La classe Facture deviendrait responsable de la facturation et des règles de récompense. Cela mélange deux responsabilités (facturation vs stratégie de fidélité) et rend Facture plus fragile aux changements de politique de récompense.
+
+
+4) Refaire la conception en respectant SOLID en utilisant le patron Strategy (conception)
+
+- Idée : extraire la logique de récompense dans des objets dédiés appelés stratégies.
+- Interface : `RewardStrategy` avec `void appliquerRecompense(Facture f, CarteClient c)` (ou `void appliquer(Facture f)` si la stratégie connaît la carte).
+- Implémentations : `PointsRewardStrategy`, `AirmilesRewardStrategy`, etc., qui encapsulent les règles affichées dans le tableau (Crédit: 2 pts/miles /$ ; Cash: 1 point /$ ou 1 mile /2$).
+- Rôle des classes :
+  - `CarteClient` : contient uniquement les données du client et expose sa stratégie (ou retourne la stratégie via `getRewardStrategy()`).
+  - `Facture` : contient montant, mode de paiement et (éventuellement) la carte ; si la carte est fournie, `Facture` demande à la stratégie d’appliquer la récompense.
+- Avantages SOLID : SRP (séparation des données et règles), OCP (ajout de nouvelles stratégies sans modifier classes existantes), DIP (Facture/Cartes dépendant d’une abstraction `RewardStrategy`).
+
+
+5) Implémentation Java (résumé des classes)
+
+- `interface RewardStrategy { void appliquerRecompense(Facture f, CarteClient c); }`
+- `class PointsRewardStrategy implements RewardStrategy` : applique les règles pour la carte Points.
+- `class AirmilesRewardStrategy implements RewardStrategy` : applique les règles pour la carte Airmiles.
+- `abstract class CarteClient { String nom; String adresse; abstract void afficherInfo(); abstract void recompenser(Facture f); /* ou abstract RewardStrategy getRewardStrategy(); */ }
+- `class Points extends CarteClient { int points; @Override recompenser(Facture f) { /* Crédit: +2*montant ; Cash: +1*montant */ } }
+- `class Airmiles extends CarteClient { double miles; @Override recompenser(Facture f) { /* Crédit: +2*montant ; Cash: +montant/2 */ } }
+- `class Facture { double montant; ModePaiement mode; CarteClient carte;`
+  - constructeur sans carte : interdit `ModePaiement.POINTS`, affiche message de paiement réussi ;
+  - constructeur avec carte : appelle `carte.recompenser(this)` (ou `carte.getRewardStrategy().appliquerRecompense(this, carte)`) puis affiche le message.
+
+Remarque d'implémentation : on peut soit forcer chaque carte à fournir sa stratégie (`abstract getRewardStrategy()`), soit donner la stratégie via constructeur (immuable) ou via setter (mutable si on veut promotions temporaires).
+
+
+6) Proposer un autre patron de conception utile (différent de Strategy)
+
+- Patron choisi : Factory Method / Abstract Factory
+
+  a) Problème résolu : centraliser la création d'objets (cartes) et l'association correcte des stratégies par défaut, gérer variantes (promotions, types spécifiques) sans disperser la logique de création.
+
+  b) Intégration :
+   - Classes impactées : pas de changement majeur aux API de `CarteClient`, `Points`, `Airmiles`.
+   - Nouvelles classes : `CarteFactory` (méthode `createCarte(CarteType t, String nom, String adresse)`) ; éventuellement `RewardStrategyFactory` si la stratégie dépend du contexte.
+   - Responsabilités déplacées : la logique d'instanciation et d'association (carte + stratégie) est isolée dans la factory.
+
+  c) Exemple d'évolution : ajouter `CarteOr` avec une règle spéciale pendant les fêtes. On ajoute `CarteOr` et `CarteOrHolidayStrategy`, et on met à jour la factory pour retourner la carte avec la stratégie adéquate selon la période. Le reste du code (Facture, UI) reste inchangé.
+
+  d) Limites/coûts : complexité supplémentaire (une couche de création à maintenir), risque de factory très grande si beaucoup de combinaisons ; possibilité d'utiliser une configuration externe ou DI si la création devient dynamique.
+
+
+Annexe — recommandations pour le TP pratique :
+- Respecter SRP en séparant données (cartes) et logique (stratégies).
+- Préférer une stratégie immuable fournie par la carte (ou par une factory) plutôt qu'un setter mutable, pour éviter des incohérences.
+- Fournir des tests unitaires pour chaque `RewardStrategy`.
+
+
+Fin du document.
