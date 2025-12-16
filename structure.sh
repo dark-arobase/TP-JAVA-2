@@ -3,14 +3,6 @@
 Ce document décrit l'arborescence livrée et le rôle des fichiers.
 
 TP2/
-├── src_initial/            # Version avant SOLID (pour les questions 1–3)
-│   ├── CarteClient.java         # Classe abstraite (version initiale : contient recompenser)
-│   ├── CartePoints.java         # Implémentation initiale de carte points
-│   ├── CarteAirmiles.java       # Implémentation initiale de carte airmiles
-│   ├── Facture.java             # Facture (version initiale : appelle carte.recompenser)
-│   ├── ModePaiement.java        # Enum des modes de paiement (CASH, DEBIT, CREDIT, POINTS)
-│   └── AppInitial.java          # Demo pour la version initiale
-│
 ├── src/                    # Version SOLID + Strategy (la bonne)
 │   ├── CarteClient.java         # Classe abstraite (données du client)
 │   ├── CartePoints.java         # Carte Points (données + méthodes d'accès)

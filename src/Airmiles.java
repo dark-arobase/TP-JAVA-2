@@ -4,7 +4,7 @@ public class Airmiles extends CarteClient {
 
     public Airmiles(String nomClient, String adresse) {
         super(nomClient, adresse);
-        this.nombreMile = 0.0;
+        this.nombreMile = 0.00;
     }
 
     public double getNombreMile() {
