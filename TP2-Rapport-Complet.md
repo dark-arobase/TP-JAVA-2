@@ -88,6 +88,10 @@ Une classe ne devrait avoir qu'une seule raison de changer. En plaçant la méth
 
 ---
 
+## CONCEPTION INITIALE (DIAGRAMME FOURNI)
+
+Le diagramme présenté illustre la conception initiale du système de fidélisation. Dans cette version, la méthode `recompenser(Facture f)` est définie dans la classe abstraite `CarteClient` et implémentée dans les classes `CartePoints` et `CarteAirmiles`. La classe `Facture` appelle directement cette méthode lors de la facturation, et la logique de récompense dépend à la fois du type de carte et du mode de paiement. Cette conception permet de mettre en évidence les violations des principes SOLID analysées dans les questions 1 à 3, notamment le principe de responsabilité unique.
+
 ## PROPOSITION D'UN AUTRE PATRON
 
 ### Patron choisi: DECORATOR
