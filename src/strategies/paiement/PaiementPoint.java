@@ -9,6 +9,7 @@ public class PaiementPoint extends StrategyPaiement {
         this.carte = carte;
     }
 
+    
     @Override
     public boolean effectuerPaiement(double montant) {
         if (carte == null) {
@@ -18,6 +19,7 @@ public class PaiementPoint extends StrategyPaiement {
         System.out.println("Paiement de " + montant + "$ par points de fidélité effectué.");
         return true;
     }
+
 
     @Override
     public String getNomPaiement() {

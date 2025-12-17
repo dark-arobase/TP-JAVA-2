@@ -2,7 +2,7 @@ package facture;
 
 import cartes.CarteClient;
 import strategies.paiement.StrategyPaiement;
-import strategies.paiement.PaiementPoint;
+import strategies.recompense.RecompenseFactory;
 
 public class Facture {
     private CarteClient carte;
@@ -10,20 +10,18 @@ public class Facture {
     private StrategyPaiement strategyPaiement;
 
     public Facture(double montant, StrategyPaiement modePaiement) {
-        if (modePaiement instanceof PaiementPoint) {
-            throw new IllegalArgumentException(
-                "Erreur: Le paiement par points nécessite une carte client!");
-        }
-
         this.montant = montant;
         this.strategyPaiement = modePaiement;
         this.carte = null;
 
-        if (strategyPaiement.effectuerPaiement(montant)) {
+        boolean success = strategyPaiement.effectuerPaiement(montant);
+        if (success) {
             System.out.println("Le paiement par " + modePaiement.getNomPaiement() + 
                              " a été fait avec succès");
             System.out.println("Montant payé: " + montant + "$");
             System.out.println("Aucune récompense appliquée (pas de carte client).\n");
+        } else {
+            System.out.println("Le paiement par " + modePaiement.getNomPaiement() + " a échoué.\n");
         }
     }
 
@@ -32,12 +30,16 @@ public class Facture {
         this.strategyPaiement = modePaiement;
         this.carte = client;
 
-        if (strategyPaiement.effectuerPaiement(montant)) {
+        boolean success = strategyPaiement.effectuerPaiement(montant);
+        if (success) {
             System.out.println("Le paiement par " + modePaiement.getNomPaiement() + 
                              " a été fait avec succès");
             System.out.println("Montant payé: " + montant + "$");
 
             if (carte != null) {
+                // Déterminer et assigner la stratégie de récompense avant d'appliquer
+                strategies.recompense.StrategyRecompense sr = RecompenseFactory.creer(carte, modePaiement);
+                carte.setStrategyRecompense(sr);
                 carte.recompenser(this);
             }
             System.out.println();

@@ -43,23 +43,7 @@ public class CartePoints extends CarteClient {
 
     @Override
     public void recompenser(facture.Facture f) {
-        strategies.recompense.StrategyRecompense s;
-        strategies.paiement.StrategyPaiement p = f.getStrategyPaiement();
-        String nom = p.getNomPaiement();
-        if (p instanceof strategies.paiement.PaiementPoint) {
-            System.out.println("Aucune récompense pour paiement par points.");
-            return;
-        }
-        if (nom.equals("Crédit")) {
-            s = new strategies.recompense.RecompensePoints.RecompensePointsCredit();
-        } else if (nom.equals("Cash")) {
-            s = new strategies.recompense.RecompensePoints.RecompensePointsCash();
-        } else if (nom.equals("Débit")) {
-            s = new strategies.recompense.RecompensePoints.RecompensePointsDebit();
-        } else {
-            s = new strategies.recompense.RecompenseAucune();
-        }
-        setStrategyRecompense(s);
         appliquerRecompense(f.getMontant());
+        System.out.println("Vous avez accumulé " + getNombrePoints() + " points\n");
     }
 }
